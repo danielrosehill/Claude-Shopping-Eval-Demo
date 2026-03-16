@@ -4,12 +4,28 @@
 
 A demo of using [Claude Code](https://claude.ai/claude-code) as a consumer purchasing assistant for a relatively small purchase — in this case, a portable Bluetooth speaker.
 
-## Why This Works
+## How It Works
+
+```
+┌──────────────┐     ┌────────────────┐     ┌───────────────┐     ┌─────────────┐     ┌──────────┐
+│ Define Specs │────▶│ Gather Prices  │────▶│  Run Agent    │────▶│ Read Report │────▶│ Purchase │
+│              │     │                │     │               │     │             │     │          │
+│ Write what   │     │ Screenshot     │     │ /recommend    │     │ Typeset PDF │     │ Buy with │
+│ you need in  │     │ catalog pages  │     │ analyzes spec │     │ with ranked │     │ full     │
+│ spec.md      │     │ from stores    │     │ vs. all data  │     │ picks       │     │ context  │
+└──────────────┘     └────────────────┘     └───────────────┘     └─────────────┘     └──────────┘
+```
+
+## Advantages of This Approach
+
+This approach is slower than browsing websites — but that's the point. It would simply not be possible to manually look up spec sheets and cross-reference them against a personal requirements document in the time it takes Claude to run through the catalogs. The result is a much more precise match against your actual needs, not just a "top 10 best speakers" listicle.
 
 I've used this exact pattern many times for consumer purchases, each time with excellent results. The process consistently:
 
+- **Matches against your actual spec, not generic reviews** — Claude reads your requirements document and evaluates every product against *your* criteria (room size, use case, budget), not a reviewer's assumptions
 - **Surfaces products I wouldn't have considered** — Claude cross-references across stores and price tiers, catching options I'd have scrolled past
 - **Catches pricing anomalies** — especially useful living in Israel, where products are often marked up significantly versus international markets. Sometimes you discover things are actually *well-priced* locally (as in this case — the JBL Flip 7 was 27% below international RRP at KSP)
+- **Identifies value for money precisely** — by comparing local prices against international RRP across every store, Claude can instantly flag which products are overpriced locally and which are genuine deals
 - **Handles AliExpress vs local trade-offs** — AliExpress is often cheaper, but shipping takes weeks and there's no local warranty. Claude factors this into the recommendation rather than just sorting by price
 
 ## The Pattern
@@ -65,6 +81,7 @@ Using custom slash commands and subagents (see `.claude/`), Claude:
 ### Slash Commands (`.claude/commands/`)
 
 - **`/add-product`** — Scan a new catalog screenshot and add its products to the dataset
+- **`/catalog-to-json`** — Extract all products from catalog screenshots into structured `products.json` (useful as a first pass before analysis, or for building a persistent product database)
 - **`/compare`** — Side-by-side comparison of specific products across all stores
 - **`/recommend`** — Generate the full ranked recommendation report from spec + catalogs
 
@@ -82,6 +99,39 @@ See the full report: [`recommendations.pdf`](recommendations.pdf)
 4. Run `/recommend` in Claude Code
 
 The pattern works for any consumer purchase where you want to compare across multiple stores and evaluate against specific requirements.
+
+## Recommended Additional Tooling
+
+The catalog screenshot approach works well on its own, but you can significantly enhance it with live data ingestion and better output formatting.
+
+### Live Search & Price Ingestion
+
+The demo uses static screenshots, but for real-time pricing you'll want an MCP server or tool that can fetch current web data:
+
+- **Gemini MCP** — I used Gemini for real-time search ingestion in the actual research behind this demo. Gemini's grounding in Google Search makes it especially good at pulling current prices and specs from product pages. Configure it as an MCP server so Claude can call it mid-analysis.
+- **Firecrawl** — A web scraping tool available as an MCP server. Useful for extracting structured data from product pages, especially when you need to pull full spec sheets rather than just prices.
+- **Context7** or similar documentation/search MCPs — helpful for pulling manufacturer spec sheets and datasheets when you need precise technical comparisons.
+
+### PDF Output with Typst
+
+The recommendation report in this demo is typeset with [Typst](https://typst.app/), a modern document preparation system. Typst is ideal for this use case because:
+
+- Claude can write Typst markup directly — the syntax is clean and LLM-friendly
+- Compilation is near-instant (`typst compile recommendations.typ`)
+- The output is a properly typeset PDF with tables, color-coded cards, and professional formatting
+- No LaTeX installation or dependency hell required
+
+Install Typst:
+```bash
+# On most systems
+cargo install --git https://github.com/typst/typst --locked typst-cli
+
+# Or via package manager
+brew install typst        # macOS
+sudo snap install typst   # Ubuntu
+```
+
+The `/recommend` command generates a `.typ` file and compiles it automatically. See [`recommendations.typ`](recommendations.typ) for an example of what Claude produces.
 
 ---
 
