@@ -1,3 +1,5 @@
+[![Claude Code Project](https://img.shields.io/badge/Claude%20Code-Project-blue?style=flat-square&logo=github)](https://github.com/danielrosehill/Claude-Code-Repos-Index)
+
 # Claude Shopping Eval Demo
 
 A demo of using [Claude Code](https://claude.ai/claude-code) as a consumer purchasing assistant for a relatively small purchase — in this case, a portable Bluetooth speaker.
@@ -80,3 +82,7 @@ See the full report: [`recommendations.pdf`](recommendations.pdf)
 4. Run `/recommend` in Claude Code
 
 The pattern works for any consumer purchase where you want to compare across multiple stores and evaluate against specific requirements.
+
+---
+
+For more Claude Code projects, visit [my index](https://github.com/danielrosehill/Claude-Code-Repos-Index).
