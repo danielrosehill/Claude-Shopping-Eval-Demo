@@ -104,12 +104,18 @@ The pattern works for any consumer purchase where you want to compare across mul
 
 The catalog screenshot approach works well on its own, but you can significantly enhance it with live data ingestion and better output formatting.
 
-### Live Search & Price Ingestion
+### MCP Servers (Included in `.mcp.json`)
 
-The demo uses static screenshots, but for real-time pricing you'll want an MCP server or tool that can fetch current web data:
+This repo ships with a [`.mcp.json`](.mcp.json) that pre-configures two MCP servers for live data ingestion — far more efficient than working through catalog screenshots:
+
+- **[Playwright MCP](https://github.com/microsoft/playwright-mcp)** — Browser automation via MCP. Particularly useful for retailer sites that block bots/scrapers — Playwright drives a real browser, so Claude can navigate product pages, handle JavaScript-rendered content, and extract prices even from sites that resist traditional scraping. Great for Israeli retailers like KSP and Bug that use heavy client-side rendering.
+- **[Firecrawl MCP](https://github.com/mendableai/firecrawl-mcp)** — Web scraping and crawling via MCP. Useful for extracting structured data from product pages, especially when you need to pull full spec sheets rather than just prices. Requires a [Firecrawl API key](https://firecrawl.dev/) — set `FIRECRAWL_API_KEY` in the `.mcp.json` or your environment.
+
+With both configured, Claude can pull live pricing and specs directly during analysis instead of relying solely on screenshots.
+
+### Additional Search & Ingestion
 
 - **Gemini MCP** — I used Gemini for real-time search ingestion in the actual research behind this demo. Gemini's grounding in Google Search makes it especially good at pulling current prices and specs from product pages. Configure it as an MCP server so Claude can call it mid-analysis.
-- **Firecrawl** — A web scraping tool available as an MCP server. Useful for extracting structured data from product pages, especially when you need to pull full spec sheets rather than just prices.
 - **Context7** or similar documentation/search MCPs — helpful for pulling manufacturer spec sheets and datasheets when you need precise technical comparisons.
 
 ### PDF Output with Typst
